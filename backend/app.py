@@ -1,6 +1,7 @@
 """
 Modern Flask application with proper structure
 """
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from supabase import create_client, Client
@@ -529,5 +530,7 @@ def internal_error(error):
 
 
 if __name__ == '__main__':
-    app.run(debug=Config.DEBUG, port=Config.PORT, host='0.0.0.0')
+    # Railway sets PORT environment variable automatically
+    port = int(os.getenv('PORT', Config.PORT))
+    app.run(debug=Config.DEBUG, port=port, host='0.0.0.0')
 

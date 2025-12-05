@@ -1,0 +1,9 @@
+[phases.setup]
+nixPkgs = ["python3", "pip"]
+
+[phases.install]
+cmds = ["pip install -r requirements-core.txt"]
+
+[start]
+cmd = "python app.py"
+

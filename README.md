@@ -57,10 +57,14 @@ DCrypto is a modern web application that helps users track, analyze, and manage 
 - **TensorFlow/Keras** - LSTM price prediction model
 
 ### Infrastructure
-- **Supabase** - Database, Authentication, and API
-- **Render** - Backend hosting (recommended)
-- **Replit** - Frontend hosting (recommended)
+- **Supabase** - Database, Authentication, and API (Free tier available)
+- **Render** - Backend hosting (Free tier with spin-down, $7/month for always-on)
+- **Replit** - Frontend hosting (Free tier available)
 - **Custom Domain** - `dcrpyto.com` (configured)
+
+**Hosting Costs:**
+- **Free Option**: Render free tier (15min spin-down) + Replit free tier
+- **Production Option**: Render Starter ($7/month) + Replit free tier = **$7/month total**
 
 ## 🚀 Quick Start
 

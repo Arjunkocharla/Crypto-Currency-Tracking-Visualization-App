@@ -100,10 +100,24 @@ PYTHON_VERSION=3.11.0
    ```
 3. Click **"Save Changes"** (will trigger a redeploy)
 
-### Render Free Tier Limitations
-- Services spin down after 15 minutes of inactivity
-- First request after spin-down takes ~30 seconds (cold start)
-- Upgrade to paid plan for always-on service
+### Render Pricing Options
+
+**Free Tier (Hobby Plan):**
+- ✅ Free forever
+- ⚠️ Services spin down after 15 minutes of inactivity
+- ⚠️ First request after spin-down takes ~30 seconds (cold start)
+- ⚠️ Not ideal for production use
+
+**Starter Plan ($7/month):**
+- ✅ Always-on service (no spin-down)
+- ✅ Faster response times
+- ✅ Better for production
+- ✅ Recommended for DCrypto backend
+
+**Recommendation:** 
+- For development/testing: Use free tier
+- For production: Upgrade to Starter plan ($7/month) to avoid cold starts
+- Alternative: Use Railway.app or Fly.io which have better free tiers
 
 ---
 
