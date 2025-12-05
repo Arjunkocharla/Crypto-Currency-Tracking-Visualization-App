@@ -34,18 +34,24 @@ Step-by-step guide for deploying DCrypto backend to Railway.app.
 
 ### Step 3: Configure Service
 
-Railway will try to auto-detect, but you need to configure it:
+**IMPORTANT: Set Root Directory First!**
 
-1. **Set Root Directory:**
+1. **Set Root Directory (CRITICAL):**
    - Go to your service → **Settings** → **Source**
    - Set **Root Directory** to: `backend`
    - Click **"Save"**
+   - **This is required!** Railway needs to know where your Python app is.
 
-2. **Configure Build Settings:**
-   - Railway should auto-detect Python
+2. **Configure Build Settings (if needed):**
+   - After setting root directory, Railway should auto-detect Python
    - If not, go to **Settings** → **Build**
-   - Build Command: `pip install -r requirements-core.txt`
-   - Start Command: `python app.py`
+   - Builder: `NIXPACKS` (or `Dockerfile` if you prefer)
+   - Railway will use `backend/nixpacks.toml` or `backend/Dockerfile`
+
+3. **Alternative: Use Dockerfile:**
+   - If Nixpacks fails, go to **Settings** → **Build**
+   - Change Builder to: `Dockerfile`
+   - Railway will use `backend/Dockerfile`
 
 ### Step 4: Set Environment Variables
 
