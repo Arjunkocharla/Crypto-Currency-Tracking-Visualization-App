@@ -1,19 +1,94 @@
-/* all frontend code is written by team mate niharika chundury, i did help in error resolution of code */
+/**
+ * Main App component with routing
+ * Uses Supabase Auth for authentication
+ */
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
+import Layout from './components/Layout';
+import Home from './components/Home';
+import Analysis from './components/Analysis';
+import Login from './components/Login';
+import theme from './theme';
+import { supabase } from './services/supabase';
 
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+// Protected Route Component
+function ProtectedRoute({ children }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-import Home from "./components/Home";
-import Analysis from "./components/Analysis";
+  useEffect(() => {
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+      setLoading(false);
+      
+      // Sync with localStorage for backward compatibility
+      if (session) {
+        localStorage.setItem('authToken', session.access_token);
+        localStorage.setItem('userEmail', session.user.email);
+        localStorage.setItem('userId', session.user.id);
+      }
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+      
+      if (session) {
+        localStorage.setItem('authToken', session.access_token);
+        localStorage.setItem('userEmail', session.user.email);
+        localStorage.setItem('userId', session.user.id);
+      } else {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('authProvider');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // You can replace this with a proper loading component
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <Layout>{children}</Layout>;
+}
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home/>} />
-        <Route path="/Analysis" element={<Analysis/>} />
-      </Routes>
-    </Router>
+    <ChakraProvider theme={theme}>
+      <ColorModeScript initialColorMode={theme.config.initialColorMode} />
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/analysis"
+            element={
+              <ProtectedRoute>
+                <Analysis />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </ChakraProvider>
   );
 }
 
