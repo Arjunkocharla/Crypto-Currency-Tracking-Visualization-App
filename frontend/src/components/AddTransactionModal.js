@@ -175,7 +175,7 @@ export default function AddTransactionModal({ isOpen, onClose, onSuccess }) {
               </Select>
             </FormControl>
 
-            <HStack spacing={4} width="100%">
+            <HStack spacing={4} width="100%" align="flex-start">
               <FormControl isRequired flex={1}>
                 <FormLabel fontWeight="medium" mb={2}>
                   Type
@@ -220,7 +220,7 @@ export default function AddTransactionModal({ isOpen, onClose, onSuccess }) {
               />
             </FormControl>
 
-            <HStack spacing={4} width="100%">
+            <HStack spacing={4} width="100%" align="flex-start">
               <FormControl isRequired flex={1}>
                 <FormLabel fontWeight="medium" mb={2}>
                   Price per Coin (USD)

@@ -70,9 +70,9 @@ export default function PerformanceAnalytics() {
     try {
       setLoading(true);
       const [perfData, historyData, performersData] = await Promise.all([
-        api.getPerformance('default', selectedPeriod),
-        api.getPortfolioHistory('default', selectedPeriod === 'all' ? 365 : parseInt(selectedPeriod) || 30),
-        api.getPerformers('default', 5),
+        api.getPerformance(null, selectedPeriod),
+        api.getPortfolioHistory(null, selectedPeriod === 'all' ? 365 : parseInt(selectedPeriod) || 30),
+        api.getPerformers(null, 5),
       ]);
       setPerformance(perfData);
       setHistory(historyData);

@@ -48,10 +48,12 @@ Step-by-step guide for deploying DCrypto backend to Railway.app.
    - Builder: `NIXPACKS` (or `Dockerfile` if you prefer)
    - Railway will use `backend/nixpacks.toml` or `backend/Dockerfile`
 
-3. **Alternative: Use Dockerfile:**
-   - If Nixpacks fails, go to **Settings** → **Build**
+3. **Use Dockerfile (Recommended):**
+   - Go to **Settings** → **Build**
    - Change Builder to: `Dockerfile`
-   - Railway will use `backend/Dockerfile`
+   - Dockerfile Path: `backend/Dockerfile`
+   - This is more reliable than Nixpacks for monorepos
+   - Railway will use `backend/Dockerfile` for building
 
 ### Step 4: Set Environment Variables
 

@@ -15,7 +15,6 @@ import {
   Input,
   FormControl,
   FormLabel,
-  Select,
   useToast,
   Text,
   Alert,
@@ -28,10 +27,8 @@ import {
 import api from '../services/api';
 
 export default function ImportBrokerModal({ isOpen, onClose, onSuccess }) {
-  const [broker, setBroker] = useState('');
+  const [broker] = useState('coinbase'); // Always Coinbase, no dropdown
   const [credentials, setCredentials] = useState({
-    username: '',
-    password: '',
     api_key: '',
     api_secret: '',
   });
@@ -39,25 +36,15 @@ export default function ImportBrokerModal({ isOpen, onClose, onSuccess }) {
   const toast = useToast();
   const bg = useColorModeValue('white', 'gray.800');
 
-  const handleBrokerChange = (value) => {
-    setBroker(value);
-    setCredentials({
-      username: '',
-      password: '',
-      api_key: '',
-      api_secret: '',
-    });
-  };
-
   const handleCredentialChange = (field, value) => {
     setCredentials((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleImport = async () => {
-    if (!broker) {
+    if (!credentials.api_key || !credentials.api_secret) {
       toast({
         title: 'Error',
-        description: 'Please select a broker',
+        description: 'Please provide Coinbase API credentials',
         status: 'error',
         duration: 3000,
       });
@@ -66,21 +53,12 @@ export default function ImportBrokerModal({ isOpen, onClose, onSuccess }) {
 
     setLoading(true);
     try {
-      let brokerCredentials = {};
-      
-      if (broker === 'robinhood') {
-        brokerCredentials = {
-          username: credentials.username,
-          password: credentials.password,
-        };
-      } else if (broker === 'coinbase') {
-        // Send in JSON format that backend expects
-        // Backend will also accept api_key/api_secret format
-        brokerCredentials = {
-          name: credentials.api_key,  // Full path: organizations/.../apiKeys/...
-          privateKey: credentials.api_secret,  // PEM format private key
-        };
-      }
+      // Send in JSON format that backend expects
+      // Backend will also accept api_key/api_secret format
+      const brokerCredentials = {
+        name: credentials.api_key,  // Full path: organizations/.../apiKeys/...
+        privateKey: credentials.api_secret,  // PEM format private key
+      };
 
       // Don't pass useMockData - backend will auto-use mock if auth succeeds but no transactions found
       // userId will be automatically retrieved from localStorage by the API service
@@ -154,61 +132,7 @@ export default function ImportBrokerModal({ isOpen, onClose, onSuccess }) {
               </Box>
             </Alert>
 
-            <FormControl isRequired>
-              <FormLabel fontWeight="medium" mb={2}>
-                Select Broker
-              </FormLabel>
-              <Select
-                placeholder="Choose a broker"
-                value={broker}
-                onChange={(e) => handleBrokerChange(e.target.value)}
-                size="md"
-                borderRadius="lg"
-              >
-                <option value="robinhood">Robinhood</option>
-                <option value="coinbase">Coinbase</option>
-              </Select>
-            </FormControl>
-
-            {broker && <Divider />}
-
-            {broker === 'robinhood' && (
-              <VStack spacing={4}>
-                <FormControl>
-                  <FormLabel fontWeight="medium" mb={2}>
-                    Username
-                  </FormLabel>
-                  <Input
-                    type="text"
-                    value={credentials.username}
-                    onChange={(e) => handleCredentialChange('username', e.target.value)}
-                    placeholder="Your Robinhood username"
-                    size="md"
-                    borderRadius="lg"
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel fontWeight="medium" mb={2}>
-                    Password
-                  </FormLabel>
-                  <Input
-                    type="password"
-                    value={credentials.password}
-                    onChange={(e) => handleCredentialChange('password', e.target.value)}
-                    placeholder="Your Robinhood password"
-                    size="md"
-                    borderRadius="lg"
-                  />
-                </FormControl>
-                <Alert status="warning" borderRadius="lg" fontSize="sm">
-                  <AlertIcon />
-                  Note: Robinhood requires OAuth2 authentication. This is a placeholder implementation.
-                </Alert>
-              </VStack>
-            )}
-
-            {broker === 'coinbase' && (
-              <VStack spacing={4}>
+            <VStack spacing={4}>
                 <Alert status="info" borderRadius="lg" fontSize="sm">
                   <AlertIcon />
                   <Box>
@@ -306,8 +230,7 @@ export default function ImportBrokerModal({ isOpen, onClose, onSuccess }) {
                     </Text>
                   </Box>
                 </Alert>
-              </VStack>
-            )}
+            </VStack>
           </VStack>
         </ModalBody>
         <Divider />

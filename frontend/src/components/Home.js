@@ -557,7 +557,7 @@ export default function Home() {
       </Box>
 
       {/* Action Buttons - Coinbase is primary, manual add is secondary */}
-      <Flex gap={4} wrap="wrap" align="center">
+      <HStack spacing={4} align="center">
         <Button
           colorScheme="brand"
           size="lg"
@@ -576,16 +576,17 @@ export default function Home() {
           Connect Coinbase
         </Button>
         <Button
-          size="sm"
-          variant="ghost"
+          size="lg"
+          variant="outline"
           onClick={onOpen}
-          color="gray.500"
-          _hover={{ color: 'gray.700', bg: 'gray.100' }}
+          colorScheme="gray"
+          _hover={{ bg: 'gray.100', borderColor: 'gray.300' }}
           _dark={{ _hover: { bg: 'gray.700' } }}
+          px={8}
         >
           + Add Manually
         </Button>
-      </Flex>
+      </HStack>
 
       {/* Transactions Section */}
       <Box

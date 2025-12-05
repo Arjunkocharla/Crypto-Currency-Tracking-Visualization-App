@@ -9,6 +9,7 @@ import Layout from './components/Layout';
 import Home from './components/Home';
 import Analysis from './components/Analysis';
 import Login from './components/Login';
+import SignUp from './components/SignUp';
 import theme from './theme';
 import { supabase } from './services/supabase';
 
@@ -34,14 +35,23 @@ function ProtectedRoute({ children }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setIsAuthenticated(!!session);
       
       if (session) {
+        // Clear sessionStorage when user changes (login or signup)
+        if (event === 'SIGNED_IN' || event === 'SIGNED_UP') {
+          sessionStorage.removeItem('portfolioSummary');
+          sessionStorage.removeItem('portfolioHoldings');
+        }
+        
         localStorage.setItem('authToken', session.access_token);
         localStorage.setItem('userEmail', session.user.email);
         localStorage.setItem('userId', session.user.id);
       } else {
+        // Clear everything on logout
+        sessionStorage.removeItem('portfolioSummary');
+        sessionStorage.removeItem('portfolioHoldings');
         localStorage.removeItem('authToken');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userId');
@@ -70,6 +80,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route
             path="/"
             element={

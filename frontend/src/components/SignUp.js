@@ -1,5 +1,5 @@
 /**
- * Modern Login Page - Vibrant design matching app theme
+ * Modern Sign Up Page - Vibrant design matching app theme
  * Uses Supabase Auth for authentication
  */
 import React, { useState } from 'react';
@@ -51,9 +51,10 @@ const GoogleIcon = () => (
   </svg>
 );
 
-export default function Login() {
+export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
   const [errors, setErrors] = useState({});
@@ -63,6 +64,10 @@ export default function Login() {
   const glassBg = useColorModeValue('rgba(255, 255, 255, 0.7)', 'rgba(26, 32, 44, 0.8)');
   const borderColor = useColorModeValue('rgba(99, 102, 241, 0.2)', 'gray.700');
   const textColor = useColorModeValue('gray.800', 'whiteAlpha.900');
+  const leftBg = useColorModeValue(
+    'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+    'linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #581c87 100%)'
+  );
 
   const validate = () => {
     const newErrors = {};
@@ -76,11 +81,16 @@ export default function Login() {
     } else if (password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignUp = async () => {
     setIsLoadingGoogle(true);
     
     try {
@@ -99,8 +109,8 @@ export default function Login() {
       // The session will be handled by Supabase when the user returns
     } catch (error) {
       toast({
-        title: 'Google sign-in failed',
-        description: error.message || 'Unable to sign in with Google',
+        title: 'Google sign-up failed',
+        description: error.message || 'Unable to sign up with Google',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -119,9 +129,12 @@ export default function Login() {
     setIsLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signUp({
         email: email,
         password: password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        },
       });
 
       if (error) {
@@ -129,30 +142,23 @@ export default function Login() {
       }
 
       if (data.user) {
-        // Clear sessionStorage to prevent showing cached data from previous user
-        sessionStorage.removeItem('portfolioSummary');
-        sessionStorage.removeItem('portfolioHoldings');
-        
-        // Store user info in localStorage for backward compatibility
-        localStorage.setItem('authToken', data.session.access_token);
-        localStorage.setItem('userEmail', data.user.email);
-        localStorage.setItem('userId', data.user.id);
-        localStorage.setItem('authProvider', 'email');
-        
         toast({
-          title: 'Login successful',
-          description: 'Welcome to DCrypto!',
+          title: 'Sign up successful!',
+          description: 'Please check your email to verify your account.',
           status: 'success',
-          duration: 3000,
+          duration: 5000,
           isClosable: true,
         });
         
-        navigate('/');
+        // Navigate to login after a short delay
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
       }
     } catch (error) {
       toast({
-        title: 'Login failed',
-        description: error.message || 'Invalid email or password',
+        title: 'Sign up failed',
+        description: error.message || 'Unable to create account',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -161,11 +167,6 @@ export default function Login() {
       setIsLoading(false);
     }
   };
-
-  const leftBg = useColorModeValue(
-    'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
-    'linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #581c87 100%)'
-  );
 
   // Checkmark icon component
   const CheckIcon = () => (
@@ -188,128 +189,71 @@ export default function Login() {
         position="relative"
         overflow="hidden"
       >
-        {/* Decorative elements */}
+        {/* Decorative background elements */}
         <Box
           position="absolute"
           top="-50px"
-          right="-50px"
-          w="300px"
-          h="300px"
+          left="-50px"
+          w="200px"
+          h="200px"
           bg="whiteAlpha.100"
           borderRadius="full"
           filter="blur(60px)"
         />
         <Box
           position="absolute"
-          bottom="-100px"
-          left="-100px"
-          w="400px"
-          h="400px"
+          bottom="-50px"
+          right="-50px"
+          w="250px"
+          h="250px"
           bg="whiteAlpha.100"
           borderRadius="full"
-          filter="blur(80px)"
+          filter="blur(70px)"
         />
 
-        <VStack
-          spacing={8}
-          align="flex-start"
-          position="relative"
-          zIndex={1}
-          maxW="600px"
-        >
-          <VStack spacing={4} align="flex-start">
-            <HStack spacing={4}>
-              <Box
-                w="60px"
-                h="60px"
-                bg="whiteAlpha.200"
-                backdropFilter="blur(10px)"
-                borderRadius="xl"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                border="2px solid"
-                borderColor="whiteAlpha.300"
-              >
-                <Text color="white" fontWeight="bold" fontSize="2xl">D</Text>
-              </Box>
-              <Heading
-                size="2xl"
-                fontWeight="bold"
-                color="white"
-                letterSpacing="tight"
-              >
-                DCrypto
-              </Heading>
-            </HStack>
-            <Heading
-              size="xl"
-              fontWeight="bold"
-              color="white"
-              lineHeight="1.2"
+        <VStack spacing={6} align="flex-start" zIndex={1}>
+          <HStack spacing={4}>
+            <Box
+              w="60px"
+              h="60px"
+              bg="whiteAlpha.300"
+              borderRadius="xl"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              shadow="lg"
             >
-              Your Decentralized Crypto Portfolio
+              <Text color="white" fontWeight="bold" fontSize="3xl">D</Text>
+            </Box>
+            <Heading size="2xl" fontWeight="bold" letterSpacing="tight">
+              DCrypto
             </Heading>
-            <Text fontSize="lg" color="whiteAlpha.900" lineHeight="1.6">
-              Track, analyze, and manage your cryptocurrency investments with powerful analytics and real-time insights.
-            </Text>
-          </VStack>
-
-          <VStack spacing={4} align="flex-start" w="100%">
-            <Text fontSize="md" fontWeight="semibold" color="whiteAlpha.900">
-              Key Features:
-            </Text>
-            <List spacing={3} w="100%">
-              <ListItem display="flex" alignItems="center">
-                <CheckIcon />
-                <Text color="whiteAlpha.900">
-                  Real-time portfolio tracking across multiple exchanges
-                </Text>
-              </ListItem>
-              <ListItem display="flex" alignItems="center">
-                <CheckIcon />
-                <Text color="whiteAlpha.900">
-                  Advanced analytics and performance metrics
-                </Text>
-              </ListItem>
-              <ListItem display="flex" alignItems="center">
-                <CheckIcon />
-                <Text color="whiteAlpha.900">
-                  Automated transaction import from Coinbase & more
-                </Text>
-              </ListItem>
-              <ListItem display="flex" alignItems="center">
-                <CheckIcon />
-                <Text color="whiteAlpha.900">
-                  Beautiful visualizations and insights
-                </Text>
-              </ListItem>
-              <ListItem display="flex" alignItems="center">
-                <CheckIcon />
-                <Text color="whiteAlpha.900">
-                  Secure and decentralized architecture
-                </Text>
-              </ListItem>
-            </List>
-          </VStack>
-
-          <Box
-            mt={4}
-            p={4}
-            bg="whiteAlpha.100"
-            backdropFilter="blur(10px)"
-            borderRadius="lg"
-            border="1px solid"
-            borderColor="whiteAlpha.200"
-          >
-            <Text fontSize="sm" color="whiteAlpha.800" fontStyle="italic">
-              "The most intuitive way to manage your crypto portfolio"
-            </Text>
-          </Box>
+          </HStack>
+          <Text fontSize="lg" opacity={0.9}>
+            Join thousands of investors tracking their crypto portfolio. Start your journey today.
+          </Text>
+          <List spacing={3} fontSize="md" opacity={0.9}>
+            <ListItem>
+              <CheckIcon />
+              Real-time portfolio tracking
+            </ListItem>
+            <ListItem>
+              <CheckIcon />
+              Advanced analytics & insights
+            </ListItem>
+            <ListItem>
+              <CheckIcon />
+              Automated transaction import
+            </ListItem>
+            <ListItem>
+              <CheckIcon />
+              Secure & private architecture
+            </ListItem>
+          </List>
         </VStack>
       </Box>
 
-      {/* Right Side - Login Form */}
+      {/* Right Side - Sign Up Form */}
       <Box
         flex="1"
         display="flex"
@@ -345,7 +289,7 @@ export default function Login() {
               </Heading>
             </VStack>
 
-            {/* Login Form */}
+            {/* Sign Up Form */}
             <Box
               bg={glassBg}
               backdropFilter="blur(10px)"
@@ -358,41 +302,41 @@ export default function Login() {
               transition="all 0.3s"
             >
             <VStack spacing={6} align="stretch">
-              {/* Google Sign In Button */}
-              <Button
-                size="lg"
-                variant="outline"
-                leftIcon={<GoogleIcon />}
-                onClick={handleGoogleSignIn}
-                isLoading={isLoadingGoogle}
-                loadingText="Connecting..."
-                bg="white"
-                _dark={{ bg: 'gray.700', borderColor: 'gray.600' }}
-                borderColor={borderColor}
-                _hover={{
-                  bg: 'gray.50',
-                  _dark: { bg: 'gray.600' },
-                  borderColor: 'rgba(99, 102, 241, 0.4)',
-                  transform: 'translateY(-2px)',
-                  boxShadow: 'md',
-                }}
-                transition="all 0.3s"
-                fontWeight="medium"
-              >
-                Continue with Google
-              </Button>
+            {/* Google Sign Up Button */}
+            <Button
+              size="lg"
+              variant="outline"
+              leftIcon={<GoogleIcon />}
+              onClick={handleGoogleSignUp}
+              isLoading={isLoadingGoogle}
+              loadingText="Connecting..."
+              bg="white"
+              _dark={{ bg: 'gray.700', borderColor: 'gray.600' }}
+              borderColor={borderColor}
+              _hover={{
+                bg: 'gray.50',
+                _dark: { bg: 'gray.600' },
+                borderColor: 'rgba(99, 102, 241, 0.4)',
+                transform: 'translateY(-2px)',
+                boxShadow: 'md',
+              }}
+              transition="all 0.3s"
+              fontWeight="medium"
+            >
+              Continue with Google
+            </Button>
 
-              <HStack>
-                <Divider />
-                <Text fontSize="sm" color="gray.500" px={2}>
-                  OR
-                </Text>
-                <Divider />
-              </HStack>
+            <HStack>
+              <Divider />
+              <Text fontSize="sm" color="gray.500" px={2}>
+                OR
+              </Text>
+              <Divider />
+            </HStack>
 
-              <form onSubmit={handleSubmit}>
-                <VStack spacing={6} align="stretch">
-                  <FormControl isInvalid={errors.email}>
+            <form onSubmit={handleSubmit}>
+              <VStack spacing={6} align="stretch">
+                <FormControl isInvalid={errors.email}>
                   <FormLabel color={textColor} fontWeight="medium">
                     Email Address
                   </FormLabel>
@@ -436,6 +380,28 @@ export default function Login() {
                   <FormErrorMessage>{errors.password}</FormErrorMessage>
                 </FormControl>
 
+                <FormControl isInvalid={errors.confirmPassword}>
+                  <FormLabel color={textColor} fontWeight="medium">
+                    Confirm Password
+                  </FormLabel>
+                  <Input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm your password"
+                    size="lg"
+                    bg="whiteAlpha.900"
+                    _dark={{ bg: 'gray.700' }}
+                    borderColor={borderColor}
+                    _hover={{ borderColor: 'rgba(99, 102, 241, 0.4)' }}
+                    _focus={{
+                      borderColor: '#667eea',
+                      boxShadow: '0 0 0 1px #667eea',
+                    }}
+                  />
+                  <FormErrorMessage>{errors.confirmPassword}</FormErrorMessage>
+                </FormControl>
+
                 <Button
                   type="submit"
                   size="lg"
@@ -448,26 +414,26 @@ export default function Login() {
                     boxShadow: 'xl',
                   }}
                   isLoading={isLoading}
-                  loadingText="Signing in..."
+                  loadingText="Creating account..."
                   transition="all 0.3s"
                 >
-                  Sign In
+                  Sign Up
                 </Button>
 
                 <HStack justify="center" spacing={2}>
                   <Text color="gray.500" fontSize="sm">
-                    Don't have an account?
+                    Already have an account?
                   </Text>
                   <Button
                     as={Link}
-                    to="/signup"
+                    to="/login"
                     variant="link"
                     color="#667eea"
                     fontSize="sm"
                     fontWeight="medium"
                     _hover={{ textDecoration: 'underline' }}
                   >
-                    Sign up
+                    Sign in
                   </Button>
                 </HStack>
               </VStack>
