@@ -14,6 +14,8 @@ build/
 # Firebase
 *-firebase-adminsdk-*.json
 firebase-config.json
+.firebase/
+firebase-debug.log
 
 # Environment
 .env

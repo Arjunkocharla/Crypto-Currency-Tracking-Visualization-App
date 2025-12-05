@@ -74,6 +74,25 @@ function ProtectedRoute({ children }) {
 }
 
 function App() {
+  // Handle OAuth callback - Supabase will automatically parse hash fragments
+  useEffect(() => {
+    // Supabase client is configured with detectSessionInUrl: true
+    // This will automatically handle the OAuth callback and create a session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        // Session is already handled by Supabase, but we ensure localStorage is synced
+        localStorage.setItem('authToken', session.access_token);
+        localStorage.setItem('userEmail', session.user.email);
+        localStorage.setItem('userId', session.user.id);
+        
+        // Clean up URL hash after processing
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      }
+    });
+  }, []);
+
   return (
     <ChakraProvider theme={theme}>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
