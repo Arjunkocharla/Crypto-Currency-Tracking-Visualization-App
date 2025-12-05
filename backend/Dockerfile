@@ -7,20 +7,21 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY requirements-core.txt .
+# Copy requirements first for better caching (from backend folder)
+COPY backend/requirements-core.txt .
 
 # Install Python dependencies
-RUN pip install --upgrade pip && \
+RUN pip install --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r requirements-core.txt
 
-# Copy application code
-COPY . .
+# Copy backend application code
+COPY backend/ .
 
-# Expose port (Railway sets PORT env var)
-EXPOSE 8085
+# Expose port (Railway sets PORT env var automatically)
+EXPOSE ${PORT:-8085}
 
 # Run the application
 CMD ["python", "app.py"]
